@@ -128,35 +128,13 @@ public class graph4dijkstra {
     }
 
     private DArray<Integer> searchNextArrV(int v) { // поиск еще не зафиксированных соседей узла v
-        DArray<Integer> nextV = new DArray<>(); // массив ребер для сортировки
-        DArray<Edge> nextE = new DArray<>(); // массив вершин на вывод
+        DArray<Integer> nextV = new DArray<>();
         int step = 0;
-        int in, out;
         for (int i = 0; i < sizeEdges; i++) {
-            if (AllEdges.get(i).V1 == v) { // все непройденные ребра, связанные с вершиной v выводим в массив
-                if (!VisitedVertex.get(AllEdges.get(i).V2)) {
-                    nextE.add(step, AllEdges.get(i));
-                    step++;
-                }
+            if (AllEdges.get(i).V1 == v) {
+                nextV.add(step, AllEdges.get(i).V2);
+                step++;
             }
-
-        }
-        // insertionSort по весу ребер
-        for (out = 1; out < nextE.size(); out++) //out - разделитель
-        {
-
-            Edge temp = nextE.get(out); // Скопировать элемент на разделителе
-            in = out; // Начать перемещения с out
-            while (in > 0 && nextE.get(in - 1).W >= temp.W) //Ищем наименьший
-            {
-                nextE.set(in, nextE.get(in - 1)); //и пока не равен сдвигаем элемент вправо
-                --in; // Перейти на одну позицию влево
-            }
-            nextE.set(in, temp); // Вставляем помеченный элемент
-
-        }
-        for (int i = 0; i < nextE.size(); i++) { // вывод массива вершин
-            nextV.add(i, nextE.get(i).V2);
         }
         return nextV;
     }
