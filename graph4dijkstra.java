@@ -20,6 +20,23 @@ public class graph4dijkstra {
         sizeVertex = 0;
     }
 
+    graph4dijkstra(int size) {
+
+        G = new DArray<>();
+        DArray<eWeight> tmp = new DArray<>();
+        tmp.add(0, null);
+        for (int i = 0; i < size; i++) {
+            G.add(i, tmp);
+        }
+
+        AllEdges = new DArray<>();
+        VertexWeight = new DArray<>();
+        VisitedVertex = new DArray<>();
+        ParentVertex = new DArray<>();
+        sizeEdges = 0;
+        sizeVertex = size;
+    }
+
     public void set(int g_i, int el_i, eWeight ew) { // установка для матрицы вектора смежности (g_i - вершина, el_i индекс массива вершин куда уходят ребра, ew - объект - вершина на которую можно уйти с g_i с весом ребра)
         DArray<eWeight> tmp;
         if (el_i == 0) {
@@ -29,6 +46,14 @@ public class graph4dijkstra {
         }
         tmp.add(el_i, ew);
         G.add(g_i, tmp);
+    }
+
+    public void setArr(int v, int[] vertex, int[] weight) { // 
+        int g_i = v;
+        int sizeArr = vertex.length;
+        for (int el_i = 0; el_i < sizeArr; el_i++) {
+            set(g_i, el_i, new eWeight(vertex[el_i], weight[el_i]));
+        }
     }
 
     private eWeight get(int g_i, int el_i) { // получение вершины с весом из матрицы вектора смежности (g_i - вершина с которой идет связь на нашу вершину, el_i индекс массива вершин для вершины g_i)
@@ -191,7 +216,6 @@ public class graph4dijkstra {
             }
 
 //        resDijkstra(); // вывод результата просчета поиска путей пошагово
-
             minV = searchNextMinV();
 
         }
@@ -210,5 +234,5 @@ public class graph4dijkstra {
         }
         return res;
     }
-    
+
 }
