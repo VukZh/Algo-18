@@ -2,7 +2,7 @@ package dijkstraapp;
 
 public class graph4dijkstra {
 
-    private final DArray<DArray<eWeight>> G; // граф
+    private final eWeight[][] G; // граф
     private final DArray<Edge> AllEdges; // массив всех ребер
     private final DArray<Integer> VertexWeight; // массив веса всех вершин
     private final DArray<Boolean> VisitedVertex; // массив посещенных вершин при поиске кратчайшего пути
@@ -10,77 +10,41 @@ public class graph4dijkstra {
     private int sizeEdges; // общее число ребер графа
     private int sizeVertex; // общее число вершин графа
 
-    graph4dijkstra() {
-        G = new DArray<>();
+    graph4dijkstra(int[][] vertex, int[][] weight) {
+        G = new eWeight[vertex.length][];
         AllEdges = new DArray<>();
         VertexWeight = new DArray<>();
         VisitedVertex = new DArray<>();
         ParentVertex = new DArray<>();
         sizeEdges = 0;
         sizeVertex = 0;
+
+        graphInit(vertex, weight); // заполняем граф
+
     }
 
-    graph4dijkstra(int size) {
+    private void graphInit(int[][] v, int[][] w) {
+        for (int i = 0; i < v.length; i++) {
+            eWeight[] _w = new eWeight[v[i].length];
+            for (int j = 0; j < v[i].length; j++) {
+                _w[j] = new eWeight(v[i][j], w[i][j]);
+            }
+            G[i] = _w;
 
-        G = new DArray<>();
-        DArray<eWeight> tmp = new DArray<>();
-        tmp.add(0, null);
-        for (int i = 0; i < size; i++) {
-            G.add(i, tmp);
         }
-
-        AllEdges = new DArray<>();
-        VertexWeight = new DArray<>();
-        VisitedVertex = new DArray<>();
-        ParentVertex = new DArray<>();
-        sizeEdges = 0;
-        sizeVertex = size;
-    }
-
-    public void set(int g_i, int el_i, eWeight ew) { // установка для матрицы вектора смежности (g_i - вершина, el_i индекс массива вершин куда уходят ребра, ew - объект - вершина на которую можно уйти с g_i с весом ребра)
-        DArray<eWeight> tmp;
-        if (el_i == 0) {
-            tmp = new DArray<>();
-        } else {
-            tmp = G.get(g_i);
-        }
-        tmp.add(el_i, ew);
-        G.add(g_i, tmp);
-    }
-
-    public void setArr(int v, int[] vertex, int[] weight) { // 
-        int g_i = v;
-        int sizeArr = vertex.length;
-        for (int el_i = 0; el_i < sizeArr; el_i++) {
-            set(g_i, el_i, new eWeight(vertex[el_i], weight[el_i]));
-        }
-    }
-
-    private eWeight get(int g_i, int el_i) { // получение вершины с весом из матрицы вектора смежности (g_i - вершина с которой идет связь на нашу вершину, el_i индекс массива вершин для вершины g_i)
-        DArray<eWeight> tmp = G.get(g_i);
-        return tmp.get(el_i);
     }
 
     public void displayGraph() { // вывод графа
         System.out.println("Graph");
-        for (int i = 0; i < sizeV(); i++) {
+        for (int i = 0; i < G.length; i++) {
             System.out.print("i-" + i);
-            for (int j = 0; j < sizeS(i); j++) {
-                if (get(i, j) != null) {
-                    System.out.print(" > " + get(i, j).vertex);
+            for (int j = 0; j < G[i].length; j++) {
+                if (G[i][j] != null) {
+                    System.out.print(" > " + G[i][j].vertex);
                 }
             }
             System.out.println("");
         }
-    }
-
-    private int sizeV() { // размер матрицы вектора смежности
-        return G.size();
-    }
-
-    private int sizeS(int v) { // число вершин, на которые есть связь с вершины v
-        DArray<eWeight> tmp = G.get(v);
-        return tmp.size();
     }
 
     private void addEdge(int v1, eWeight v2) { // добавление ребра в массив всех ребер
@@ -115,10 +79,10 @@ public class graph4dijkstra {
         return e;
     }
 
-    private void createArrayEdges() { // заполнение массива всех ребер
-        for (int i = 0; i < sizeV(); i++) {
-            for (int j = 0; j < sizeS(i); j++) {
-                addEdge(i, get(i, j));
+    public void createArrayEdges() { // заполнение массива всех ребер
+        for (int i = 0; i < G.length; i++) {
+            for (int j = 0; j < G[i].length; j++) {
+                addEdge(i, G[i][j]);
             }
         }
     }
@@ -187,7 +151,7 @@ public class graph4dijkstra {
         }
     }
 
-    public void dijkstra(int start) { // поиск кратчайших путей из вершины start
+    public Edge[] dijkstra(int start) { // поиск кратчайших путей из вершины start
 
         DArray<Integer> nextV; // массив вершин, связяанных с рассматриваемой
         int minV; // следующая вершина с min весом
@@ -209,7 +173,7 @@ public class graph4dijkstra {
 
                 if (VertexWeight.get(nextV.get(i)) == -1
                         || // если бесконечность
-                        (VertexWeight.get(nextV.get(i)) != -1 && VertexWeight.get(nextV.get(i)) > getWeightEdge(minV, nextV.get(i)) + VertexWeight.get(minV))) { // или не бесконечность и больше веса текущего узла
+                        (VertexWeight.get(nextV.get(i)) != -1 && VertexWeight.get(nextV.get(i)) > getWeightEdge(minV, nextV.get(i)) + VertexWeight.get(minV))) { // или не бесконечность и больше веса текущего узла                    VertexWeight [i] = getWeightEdge(minV, nextV.get(i)) + VertexWeight [minV]; // обновляем вес от начала до этой вершины
                     VertexWeight.set(nextV.get(i), getWeightEdge(minV, nextV.get(i)) + VertexWeight.get(minV)); // обновляем вес от начала до этой вершины
                     ParentVertex.set(nextV.get(i), minV);
                 }
@@ -219,9 +183,14 @@ public class graph4dijkstra {
             minV = searchNextMinV();
 
         }
+        Edge[] result = new Edge[sizeVertex];
+        for (int i = 0; i < sizeVertex; i++) {
+            result[i] = new Edge(i, ParentVertex.get(i), VertexWeight.get(i));
+        }
+        return result;
     }
 
-    public DArray<Edge> getPath(int endVertex) { // вывод пути в виде массива ребер
+    public Edge[] getPath(int endVertex) { // вывод пути в виде массива ребер
         DArray<Edge> res = new DArray<>();
         int startV = ParentVertex.get(endVertex);
         int endV = endVertex;
@@ -232,7 +201,11 @@ public class graph4dijkstra {
             startV = ParentVertex.get(endV);
             sizeRes++;
         }
-        return res;
+        Edge[] result = new Edge[sizeRes];
+        for (int i = 0; i < sizeRes; i++) {
+            result[i] = new Edge(res.get(i).V1, res.get(i).V2, res.get(i).W);
+        }
+        return result;
     }
 
 }
